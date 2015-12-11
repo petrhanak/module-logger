@@ -18,7 +18,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace WildPHP\CoreModules;
+namespace WildPHP\CoreModules\Logger;
 
 use Monolog\Handler\ErrorLogHandler;
 use Psr\Log\LoggerInterface;
