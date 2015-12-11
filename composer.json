@@ -1,0 +1,22 @@
+{
+    "name": "wildphp/module-logger",
+    "description": "Provides logging functionality for the WildPHP framework, based on Monolog",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Yoshi2889",
+            "email": "rick.2889@gmail.com"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^1.17",
+        "wildphp/module-configuration": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "WildPHP\\CoreModules\\Logger\\": "src"
+        }
+    },
+    "minimum-stability": "alpha",
+    "prefer-stable": true
+}
