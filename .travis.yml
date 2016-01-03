@@ -1,0 +1,31 @@
+language: php
+php:
+  - 5.6
+  - 7.0
+  - hhvm
+
+install:
+  - composer install
+
+script:
+  - phpunit --coverage-clover=coverage.clover --bootstrap=./vendor/autoload.php tests
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php:
+      - nightly
+
+notifications:
+    irc:
+        channels:
+            # This must be encrypted or forks & PRs start spamming
+            # travis encrypt "ircs://irc.freenode.net:6697/#wildphp-dev" -r WildPHP/module-logger
+            - secure: "KMIFcupLgd5HMUujoAZKLFsVX+6fydpyIsOgFQl7Q3w8fAMRYes6+diwSTAVIQOvFQw1tjhCgxHEiYLSU3T18ed4/A2Q63/bG05cdgNJ2Vv1s4A3YJmtVhLa487aFUz6ZJEf592kF5z4x0BE45VozgfMckRzQeqVNa7yr+pXa/vWIqd8gUPypKFHsEIKV3UM5YuJ5B/Ovft0JDdJMtnZR452nrq+8oNjyLIl0L3LDBcRTN86muMGKllYa3nF+0liJi24A4GMS+4FlGwIeHD7FgQfofIFK8pkdDR1sLVb3R/jahRl6C6TC8sFcv4bEl27pvuvQrHfBvZkFz7kD4nW2MsX0Pca0gYSPfNo1iE5pFFYhnCxhSpqQnIueuGdkNofWlDxVTCFFV8K+r49xKlbKs+iIEn4WieZ3pQHVld3nD2Bthyx67r7UqV106PkHZVZVBffUWrCqsbBDpDZJn/fQRVKsCRyf05qHt6rL0J84GwRFK9k1C5bgyByZZ+0/ZXAG8bhaFXNuiocwdMVwKUIm6sxXvt4bIoB6BctxKAx442v5QtPdlFcNsG6HO7ieM+Ig9ZpkDh1CQldQT90E7pyNvtzDYps/e7H1/hZjKdra0MWM05UEXD51Db/Uc6DMVIqF+yaOsjK64GATN1yTdsULW2Uzez2/WG2qNrD+rW8DqY="
+
+        use_notice: true
+        skip_join: false
