@@ -20,15 +20,15 @@
 
 namespace WildPHP\CoreModules\Logger;
 
+use Monolog\Logger as MonoLogger;
 use Monolog\Handler\ErrorLogHandler;
-use Psr\Log\LoggerInterface;
 use WildPHP\BaseModule;
 use WildPHP\CoreModules\Connection\IrcDataObject;
 
 class Logger extends BaseModule
 {
 	/**
-	 * @var LoggerInterface
+	 * @var MonoLogger
 	 */
 	protected $logger;
 
@@ -39,7 +39,9 @@ class Logger extends BaseModule
 
 		$this->logger = $logger;
 
-		new LogFileHelper($this);
+		$logFileHelper = new LogFileHelper();
+		$logFileHelper->setLogger($this);
+		$logFileHelper->createNewLogFile();
 
 		$this->getEventEmitter()->on('irc.data.in', function (IrcDataObject $object)
 		{
@@ -53,7 +55,7 @@ class Logger extends BaseModule
 	}
 
 	/**
-	 * @return LoggerInterface
+	 * @return MonoLogger
 	 */
 	public function getLogger()
 	{

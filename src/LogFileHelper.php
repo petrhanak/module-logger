@@ -33,7 +33,7 @@ class LogFileHelper
 	/**
 	 * @var string
 	 */
-	protected $logFileRegex = '/log (\d{1,2}-\d{1,2}-\d{4}) \((\d+)\)/';
+	protected $logFileRegex = "/log (\\d{1,2}-\\d{1,2}-\\d{4}) \\((\\d+)\\)/";
 
 	/**
 	 * 1: Date
@@ -47,10 +47,13 @@ class LogFileHelper
 	 */
 	protected $logFileExtension = '.log';
 
-	public function __construct(Logger $logger)
+	public function setLogger(Logger $logger)
 	{
 		$this->parent = $logger;
+	}
 
+	public function createNewLogFile()
+	{
 		try
 		{
 			$path = WPHP_LOG_DIR;
@@ -58,7 +61,6 @@ class LogFileHelper
 			$file = $this->createNextLogFile($path);
 
 			$fullPath = $path . $file;
-			var_dump($fullPath);
 			$this->parent->getLogger()->pushHandler(new StreamHandler($fullPath));
 		}
 		catch (InvalidLogDirException $e)
@@ -87,32 +89,40 @@ class LogFileHelper
 
 	/**
 	 * @param string $dir
+	 * @return int|false False on failure, int on success.
+	 */
+	public function getLastFileNo($dir)
+	{
+		if (!file_exists($dir) || !is_dir($dir))
+			return false;
+
+		$files = scandir($dir, SCANDIR_SORT_ASCENDING);
+
+		$lastFileNo = 0;
+		foreach ($files as $file)
+		{
+			if (in_array($file, ['.', '..']))
+				continue;
+
+			if (!preg_match($this->logFileRegex, $file, $matches))
+				continue;
+
+			if ($matches[1] == date('d-m-Y'))
+				$lastFileNo = $matches[2];
+		}
+
+		return $lastFileNo;
+	}
+
+	/**
+	 * @param string $dir
 	 * @return string
 	 */
 	public function createNextLogFile($dir)
 	{
 		$this->createLogDir($dir);
 
-		$files = scandir($dir, SCANDIR_SORT_ASCENDING);
-
-		var_dump($dir, $files);
-
-		$lastFileNo = 0;
-		foreach ($files as $file)
-		{
-			if (!in_array($file, ['.', '..']))
-				continue;
-
-			preg_match($this->logFileRegex, $file, $matches);
-
-			var_dump($matches);
-
-			if (empty($matches))
-				continue;
-
-			if ($matches[1] == date('d-m-Y'))
-				$lastFileNo = $matches[2];
-		}
+		$lastFileNo = $this->getLastFileNo($dir);
 
 		$newFileNo = $lastFileNo + 1;
 
