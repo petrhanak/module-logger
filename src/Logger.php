@@ -36,7 +36,10 @@ class Logger extends BaseModule
 	{
 		$logger = new \Monolog\Logger('WildPHP');
 		$logger->pushHandler(new ErrorLogHandler());
+
 		$this->logger = $logger;
+
+		new LogFileHelper($this);
 
 		$this->getEventEmitter()->on('irc.data.in', function (IrcDataObject $object)
 		{
@@ -47,6 +50,14 @@ class Logger extends BaseModule
 		{
 			$this->debug('>> ' . $object->getIrcMessage());
 		});
+	}
+
+	/**
+	 * @return LoggerInterface
+	 */
+	public function getLogger()
+	{
+		return $this->logger;
 	}
 
 	/**
