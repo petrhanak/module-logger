@@ -101,14 +101,12 @@ class LogFileHelper
 		$lastFileNo = 0;
 		foreach ($files as $file)
 		{
-			if (in_array($file, ['.', '..']))
+			if (in_array($file, ['.', '..'])
+				|| !preg_match($this->logFileRegex, $file, $matches)
+				|| $matches[1] != date('d-m-Y'))
 				continue;
 
-			if (!preg_match($this->logFileRegex, $file, $matches))
-				continue;
-
-			if ($matches[1] == date('d-m-Y'))
-				$lastFileNo = $matches[2];
+			$lastFileNo = $matches[2];
 		}
 
 		return $lastFileNo;
@@ -123,12 +121,11 @@ class LogFileHelper
 		$this->createLogDir($dir);
 
 		$lastFileNo = $this->getLastFileNo($dir);
-
 		$newFileNo = $lastFileNo + 1;
 
-
 		$fileName = sprintf($this->logFilePattern, date('d-m-Y'), $newFileNo) . $this->logFileExtension;
-		touch($fileName);
+
+		touch($dir . '/' . $fileName);
 		return $fileName;
 	}
 }
