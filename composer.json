@@ -1,5 +1,5 @@
 {
-    "name": "wildphp/module-logger",
+    "name": "petrhanak/module-logger",
     "description": "Provides logging functionality for the WildPHP framework, based on Monolog",
     "license": "GPL-3.0",
     "authors": [
@@ -16,6 +16,9 @@
         "psr-4": {
             "WildPHP\\CoreModules\\Logger\\": "src"
         }
+    },
+    "replace": {
+        "wildphp/module-logger": "2.1.*"
     },
     "minimum-stability": "alpha",
     "prefer-stable": true
