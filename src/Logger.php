@@ -72,7 +72,6 @@ class Logger extends BaseModule
 			"/^:([^!]+)[^ ]+ QUIT.*$/" => "*** $1 has quit IRC"
 		];
 		$message = $this->interpolate($message, $context);
-		$this->logger->debug($message);
 		foreach ($replacements as $match => $replace)
 		{
 			if(preg_match($match, $message)) {
