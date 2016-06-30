@@ -21,7 +21,6 @@
 namespace WildPHP\CoreModules\Logger;
 
 use Monolog\Logger as MonoLogger;
-use Monolog\Handler\ErrorLogHandler;
 use WildPHP\BaseModule;
 use WildPHP\CoreModules\Connection\IrcDataObject;
 
@@ -35,7 +34,6 @@ class Logger extends BaseModule
 	public function setup()
 	{
 		$logger = new \Monolog\Logger('WildPHP');
-		$logger->pushHandler(new ErrorLogHandler());
 
 		$this->logger = $logger;
 
@@ -45,12 +43,12 @@ class Logger extends BaseModule
 
 		$this->getEventEmitter()->on('irc.data.in', function (IrcDataObject $object)
 		{
-			$this->debug('<< ' . $object->getIrcMessage());
+			$this->debug($object->getIrcMessage());
 		});
 
 		$this->getEventEmitter()->on('irc.data.out', function (IrcDataObject $object)
 		{
-			$this->debug('>> ' . $object->getIrcMessage());
+			$this->debug($object->getIrcMessage());
 		});
 	}
 
@@ -68,8 +66,20 @@ class Logger extends BaseModule
 	 */
 	public function debug($message, array $context = [])
 	{
+		$replacements = [
+			"/^:([^!]+)[^ ]+ PRIVMSG #[^ ]+ :(.*)$/" => "<$1> $2",
+			"/^:([^!]+)[^ ]+ JOIN :(#[^ ]+)$/" => "*** $1 has joined $2",
+			"/^:([^!]+)[^ ]+ QUIT.*$/" => "*** $1 has quit IRC"
+		];
 		$message = $this->interpolate($message, $context);
 		$this->logger->debug($message);
+		foreach ($replacements as $match => $replace)
+		{
+			if(preg_match($match, $message)) {
+				$msg = preg_replace($match, $replace, $message);
+				$this->logger->debug($msg);
+			}
+		}
 	}
 
 	/**

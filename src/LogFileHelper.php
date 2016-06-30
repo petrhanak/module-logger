@@ -21,6 +21,8 @@
 namespace WildPHP\CoreModules\Logger;
 
 
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\FilterHandler;
 use Monolog\Handler\StreamHandler;
 
 class LogFileHelper
@@ -61,7 +63,19 @@ class LogFileHelper
 			$file = $this->createNextLogFile($path);
 
 			$fullPath = $path . $file;
-			$this->parent->getLogger()->pushHandler(new StreamHandler($fullPath));
+
+			$dateFormat = "H:i:s";
+			$output = "%datetime%  %message%" . PHP_EOL;
+
+			$formatter = new LineFormatter($output, $dateFormat);
+
+			$stream = new StreamHandler($fullPath);
+			$stream->setFormatter($formatter);
+
+			$this->parent->getLogger()->pushHandler(new FilterHandler(
+				$stream,
+				[\Monolog\Logger::DEBUG]
+			));
 		}
 		catch (InvalidLogDirException $e)
 		{
